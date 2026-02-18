@@ -35,4 +35,4 @@ https://www.flaticon.com/free-icons/calendar — Calendar icons created by Rasel
 
 ## License
 
-Add a `LICENSE` file if/when you decide on a license.
+This project is dedicated to the public domain under the terms of the **Unlicense**. See [LICENSE](./LICENSE).
