@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RRULE Validator (Offline)</title>
+
+  <!-- Site icon -->
+  <link rel="icon" href="./favicon.ico" />
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>RRULE Validator</h1>
+    <p class="subtle">Offline, one-page validator for RFC 5545 RRULE strings (RRULE-only).</p>
+
+    <label for="rruleInput">RRULE</label>
+    <textarea id="rruleInput" spellcheck="false" placeholder="FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR"></textarea>
+
+    <div class="row">
+      <button id="validateBtn">Validate</button>
+      <button id="clearBtn" class="secondary">Clear</button>
+    </div>
+
+    <section class="panel">
+      <h2>Result</h2>
+      <div id="status" class="status">—</div>
+
+      <h3>Normalized RRULE</h3>
+      <pre id="normalized" class="pre">—</pre>
+
+      <h3>Details</h3>
+      <pre id="details" class="pre">—</pre>
+    </section>
+
+    <section class="panel">
+      <h2>Preview next occurrences</h2>
+      <p class="subtle">
+        Uses DTSTART + the RRULE to generate the next N occurrences. This helps catch rules that parse but don’t behave as expected.
+      </p>
+
+      <div class="grid">
+        <div>
+          <label for="dtstartInput">DTSTART (local time)</label>
+          <input id="dtstartInput" type="datetime-local" />
+          <div class="subtle">If empty, defaults to “now”.</div>
+        </div>
+
+        <div>
+          <label for="countInput">N (max 200)</label>
+          <input id="countInput" type="number" min="1" max="200" value="10" />
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="previewBtn">Preview</button>
+      </div>
+
+      <h3>Occurrences</h3>
+      <pre id="occurrences" class="pre">—</pre>
+    </section>
+
+    <footer class="footer subtle">
+      Uses a vendored build of <code>rrule</code>. No network required.
+      <br />
+      <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Rasel Hossin - Flaticon</a>
+    </footer>
+  </main>
+
+  <script src="./vendor/rrule.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
