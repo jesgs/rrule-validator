@@ -49,6 +49,19 @@
     return window.rrule;
   }
 
+  // Format a JS Date as a floating DTSTART string: YYYYMMDDTHHMMSS (no Z suffix).
+  // This matches the datetime-local input semantics (local, not UTC).
+  function formatDtstart(date) {
+    const pad = (x) => String(x).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    const mm = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    const hh = pad(date.getHours());
+    const mi = pad(date.getMinutes());
+    const ss = pad(date.getSeconds());
+    return `DTSTART:${yyyy}${mm}${dd}T${hh}${mi}${ss}`;
+  }
+
   // Parse datetime-local (YYYY-MM-DDTHH:mm or with seconds) as LOCAL time.
   function parseDateTimeLocal(value) {
     if (!value) return null;
@@ -108,9 +121,9 @@
   function preview() {
     occurrencesEl.textContent = '—';
 
-    let ruleObj;
+    let normalized, ruleObj;
     try {
-      ({ ruleObj } = parseRuleOrThrow());
+      ({ normalized, ruleObj } = parseRuleOrThrow());
       setStatus('good', 'VALID');
     } catch (err) {
       setStatus('bad', 'INVALID');
@@ -125,18 +138,13 @@
       parseDateTimeLocal(dtstartInput.value) ||
       new Date();
 
-    // rrule parsing via rrulestr doesn't necessarily include DTSTART in the rule.
-    // To preview properly, we rebuild an RRule with the parsed options + DTSTART.
-    // This keeps preview deterministic and user-controlled.
+    // Build a combined DTSTART+RRULE string and parse it with rrulestr so that
+    // ordinal weekday constructs like BYDAY=1TH,3TH are preserved exactly.
+    // Rebuilding via new RRule(ruleObj.options) is not safe for such constructs.
     const rrule = ensureLib();
-    const opts = ruleObj.options ? { ...ruleObj.options } : null;
-    if (!opts) {
-      occurrencesEl.textContent = 'Preview unavailable: parsed rule has no options.';
-      return;
-    }
-    opts.dtstart = dtstart;
-
-    const ruleForPreview = new rrule.RRule(opts);
+    const dtstartStr = formatDtstart(dtstart);
+    const combined = `${dtstartStr}\nRRULE:${normalized}`;
+    const ruleForPreview = rrule.rrulestr(combined);
 
     // Generate next N occurrences, safely bounded.
     const dates = ruleForPreview.all((date, i) => i < n);
